@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/purity */
+/* eslint-disable react-hooks/static-components */
 import { useState, useEffect, useRef, type Key } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Gift, Music, Music2 } from 'lucide-react';
+import { Heart, Gift, Music, Music2, Play } from 'lucide-react';
 import audio from './assets/Goo Goo Dolls - Iris.mp3';
 import { memories } from './data/memories.ts'
 import type { Memory } from './data/memories.ts';
@@ -14,19 +16,25 @@ const ValentinePage = () => {
   const startDate = new Date('2021-10-16T00:00:00'); 
 
   const toggleMusic = () => {
-    if (audioRef.current.paused) {
-      audioRef.current.play();
-      setIsPlaying(true);
-    } else {
-      audioRef.current.pause();
-      setIsPlaying(false);
+    if(audioRef.current){
+      const audio = audioRef.current
+      if (!isPlaying){
+        audio.play();
+        setIsPlaying(true);
+      }
+      else{
+        audio.pause();
+        setIsPlaying(false);
+      }
     }
   };
 
   const startExperience = () => {
     setStage('scroll');
-    audioRef.current.play();
-    setIsPlaying(true);
+    if(audioRef.current){
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
   };
 
   return (
@@ -103,7 +111,11 @@ const ValentinePage = () => {
 };
 
 // Sub-componente para las secciones de scroll
-const Section = ({ text, img }) => (
+interface SectionProp{
+  text: string;
+  img: string;
+}
+const Section = (prop: SectionProp) => (
   <motion.div 
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -111,21 +123,23 @@ const Section = ({ text, img }) => (
     className="w-full max-w-sm"
   >
     <div className="overflow-hidden rounded-3xl shadow-xl mb-6 aspect-4/5">
-      <img src={img} alt="Memoria" className="w-full h-full object-cover" />
+      <img src={prop.img} alt="Memoria" className="w-full h-full object-cover" />
     </div>
-    <p className="text-xl font-serif text-center px-4 leading-relaxed">{text}</p>
+    <p className="text-xl font-serif text-center px-4 leading-relaxed">{prop.text}</p>
   </motion.div>
 );
 
 // Componente del Contador
-const Counter = ({ startDate }) => {
+interface counterProp{
+  startDate: Date;
+}
+const Counter = ({startDate}: counterProp) => {
   const [time, setTime] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
 
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
-      const diff = now - startDate;
-      
+      const diff: number = now.getTime() - startDate.getTime();
       setTime({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -136,7 +150,12 @@ const Counter = ({ startDate }) => {
     return () => clearInterval(timer);
   }, [startDate]);
 
-  const Unit = ({ val, label }) => (
+
+  interface UnitProps{
+    val: number;
+    label: string;
+  }
+  const Unit = ({ val, label }: UnitProps) => (
     <div className="flex flex-col items-center mx-2">
       <span className="text-3xl font-bold">{val}</span>
       <span className="text-[10px] uppercase opacity-70">{label}</span>
@@ -158,7 +177,7 @@ const RainEffect = () => {
   const emojis = ['❤️', '💖', '✨', '🌸', '🍭', '🌹', '💕'];
   
   // Aumentamos a 40 elementos para que se vea más lleno en toda la pantalla
-  const items = Array.from({ length: 40 });
+  const items = Array.from({ length: 50 });
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
