@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/purity */
 /* eslint-disable react-hooks/static-components */
+import { Howl } from 'howler';
 import { useState, useEffect, useRef, type Key } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Gift, Music, Music2 } from 'lucide-react';
-import { Howl} from 'howler';
 import audio from './assets/Goo Goo Dolls - Iris.mp3';
 import { memories } from './data/memories.ts'
 import type { Memory } from './data/memories.ts';
@@ -17,6 +17,7 @@ const ValentinePage = () => {
     audioRef.current = new Howl({
       src: audio,
       loop: true,
+      html5: true,
       volume: 0.5
     })
 
