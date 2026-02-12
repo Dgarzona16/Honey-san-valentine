@@ -2,7 +2,8 @@
 /* eslint-disable react-hooks/static-components */
 import { useState, useEffect, useRef, type Key } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Gift, Music, Music2, Play } from 'lucide-react';
+import { Heart, Gift, Music, Music2 } from 'lucide-react';
+import { Howl} from 'howler';
 import audio from './assets/Goo Goo Dolls - Iris.mp3';
 import { memories } from './data/memories.ts'
 import type { Memory } from './data/memories.ts';
@@ -10,7 +11,16 @@ import type { Memory } from './data/memories.ts';
 const ValentinePage = () => {
   const [stage, setStage] = useState('cover'); 
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
+  const audioRef = useRef<Howl | null>(null);
+
+  useEffect(() => {
+    audioRef.current = new Howl({
+      src: audio,
+      loop: true,
+      volume: 0.5
+    })
+
+  },[])
 
   // Fecha de inicio (Ajusta esto con tu fecha real)
   const startDate = new Date('2021-10-16T00:00:00'); 
@@ -31,7 +41,7 @@ const ValentinePage = () => {
 
   const startExperience = () => {
     setStage('scroll');
-    if(audioRef.current){
+    if(audioRef.current && !isPlaying){
       audioRef.current.play();
       setIsPlaying(true);
     }
@@ -39,8 +49,7 @@ const ValentinePage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFF5F7] text-[#D81B60] font-sans selection:bg-[#D81B60] selection:text-white">
-      {/* Elemento de Audio Oculto */}
-      <audio ref={audioRef} src={audio} loop />
+      
 
       {/* Control de Música Flotante (Mobile friendly) */}
       {stage !== 'cover' && (
@@ -209,7 +218,7 @@ const RainEffect = () => {
               ease: "linear" // Caída constante
             }}
             className="absolute text-2xl"
-            style={{ left: `${randomLeft}%` }} // Refuerzo de posición
+            style={{ left: `${randomLeft}%`, willChange: 'transform' }} // Refuerzo de posición
           >
             {emojis[i % emojis.length]}
           </motion.div>
